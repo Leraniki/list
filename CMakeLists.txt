@@ -14,6 +14,10 @@ set(LIST_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 add_subdirectory(include)
 
+if(BUILD_SAMPLES)
+	add_subdirectory(samples)
+endif()
+
 if(BUILD_TESTING)
     add_subdirectory(gtest)
 	add_subdirectory(test)
