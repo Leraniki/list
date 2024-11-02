@@ -1,175 +1,212 @@
-﻿// ННГУ, ИИТММ, Курс "Алгоритмы и структуры данных"
-//
-// Copyright (c) Сысоев А.В.
-//
-//
-
-#ifndef __TDynamicMatrix_H__
-#define __TDynamicMatrix_H__
+﻿#ifndef __List_H__
+#define __List_H__
 
 #include <iostream>
 
 using namespace std;
 
-const int MAX_VECTOR_SIZE = 100000000;
-const int MAX_MATRIX_SIZE = 10000;
 
-// Динамический вектор - 
-// шаблонный вектор на динамической памяти
 template<typename T>
-class TDynamicVector
+class List
 {
 protected:
-  size_t sz;
-  T* pMem;
+	struct Node {
+		T data;
+		Node* next;
+		Node(const T& value, Node* next_node = nullptr) : data(value), next(next_node) {}
+	};
+	Node* first;
+
 public:
-  TDynamicVector(size_t size = 1) : sz(size)
-  {
-    if (sz == 0)
-      throw out_of_range("Vector size should be greater than zero");
-    pMem = new T[sz]();// {}; // У типа T д.б. констуктор по умолчанию
-  }
-  TDynamicVector(T* arr, size_t s) : sz(s)
-  {
-    assert(arr != nullptr && "TDynamicVector ctor requires non-nullptr arg");
-    pMem = new T[sz];
-    std::copy(arr, arr + sz, pMem);
-  }
-  TDynamicVector(const TDynamicVector& v)
-  {
-  }
-  TDynamicVector(TDynamicVector&& v) noexcept
-  {
-  }
-  ~TDynamicVector()
-  {
-  }
-  TDynamicVector& operator=(const TDynamicVector& v)
-  {
-  }
-  TDynamicVector& operator=(TDynamicVector&& v) noexcept
-  {
-      return *this;
-  }
+	List() : first(nullptr) {}
 
-  size_t size() const noexcept { return sz; }
+	List(int n, T deflt = T()) {
+		if (n == 0)
+			throw 1;
+		first = new Node(deflt, nullptr);
+		Node* current = first;
+		for (int i = 0; i < n - 1; i++) {
+			Node* tmp = new Node(deflt, nullptr);
+			current->next = tmp;
+			current = current->next;
+		}
 
-  // индексация
-  T& operator[](size_t ind)
-  {
-  }
-  const T& operator[](size_t ind) const
-  {
-  }
-  // индексация с контролем
-  T& at(size_t ind)
-  {
-  }
-  const T& at(size_t ind) const
-  {
-  }
+	}
+	List(const List& other) {
+		if (!other.first) {
+			first == nullptr;
+			throw 1;
+		}
+		this-> first = new Node(other.first->data, nullptr);
+		Node* current = first;
+		Node* ocurrent = other.first;
+		while (ocurrent->next) {
+			current->next = new Node(ocurrent->next->data, nullptr);
+			current = current->next;
+			ocurrent = ocurrent->next;
+		}
 
-  // сравнение
-  bool operator==(const TDynamicVector& v) const noexcept
-  {
-  }
-  bool operator!=(const TDynamicVector& v) const noexcept
-  {
-  }
+	}
 
-  // скалярные операции
-  TDynamicVector operator+(T val)
-  {
-  }
-  TDynamicVector operator-(double val)
-  {
-  }
-  TDynamicVector operator*(double val)
-  {
-  }
+	void clear() {
+		while (first) {
+			Node* tmp = first;
+			first = first->next;
+			delete tmp;
+		}
+		first = nullptr; 
+	}
+	
+	~List() {
+		clear();
+	}
 
-  // векторные операции
-  TDynamicVector operator+(const TDynamicVector& v)
-  {
-  }
-  TDynamicVector operator-(const TDynamicVector& v)
-  {
-  }
-  T operator*(const TDynamicVector& v) noexcept(noexcept(T()))
-  {
-  }
+	List& operator=(const List& other) {
+		if (this == &other)
+			return *this;
+		clear();
+		if (other.first) {
+			first = new Node(other.first->data);
+			Node* current = first;
+			Node* other_curr = other.first->next;
+			while (other_curr) {
+				current->next = new Node(other_curr->data);
+				current = current->next;
+				other_curr = other_curr->next;
+			}
+		}
+		return *this;
+	}
 
-  friend void swap(TDynamicVector& lhs, TDynamicVector& rhs) noexcept
-  {
-    std::swap(lhs.sz, rhs.sz);
-    std::swap(lhs.pMem, rhs.pMem);
-  }
+	void print() {
+		Node* current = first;
+		while (current != nullptr) {
+			std::cout << current->data << " ";
+			current = current->next;
+		}
+	}
 
-  // ввод/вывод
-  friend istream& operator>>(istream& istr, TDynamicVector& v)
-  {
-    for (size_t i = 0; i < v.sz; i++)
-      istr >> v.pMem[i]; // требуется оператор>> для типа T
-    return istr;
-  }
-  friend ostream& operator<<(ostream& ostr, const TDynamicVector& v)
-  {
-    for (size_t i = 0; i < v.sz; i++)
-      ostr << v.pMem[i] << ' '; // требуется оператор<< для типа T
-    return ostr;
-  }
-};
+	size_t size() { //O(n)
+		int size = 0;
+		Node* current = first;
+		while (current) {
+			size++;
+			current = current->next;
+		}
+		return size;
+	}
+
+	Node* insert(T value, Node* prev) {
+		Node* tmp = new Node(T(), nullptr);
+		tmp->next = prev->next;
+		tmp->data = value;
+		prev->next = tmp;
+		return tmp;
+	}
+
+	Node* insert_front(T value) {
+		Node* tmp = new Node(T(), nullptr);
+		tmp->next = first;
+		tmp->data = value;
+		first = tmp;
+		return first;
+
+	}
+
+	Node* erase(Node* prev) {
+		Node* tmp = prev->next;
+		if (tmp == nullptr) 
+			throw 1;
+
+		prev->next = tmp->next;
+		delete tmp;
+		return prev->next;
+	}
+
+	Node* erase_front() {
+		Node* tmp = first;
+		if (!first)
+			throw 1;
+		first = tmp->next;
+		delete tmp;
+		return first;
+	}
+
+	T& operator[](int index) { //O(n)
+		if (index < 0)
+			throw 1;
+		Node* curr = first;
+		for (int i = 0; i < index; i++) {
+			if (!curr) {
+				throw 1;
+			}
+			curr = curr->next;
+		}
+			
+		return curr->data;
+	}
 
 
-// Динамическая матрица - 
-// шаблонная матрица на динамической памяти
-template<typename T>
-class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>>
-{
-  using TDynamicVector<TDynamicVector<T>>::pMem;
-  using TDynamicVector<TDynamicVector<T>>::sz;
-public:
-  TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
-  {
-    for (size_t i = 0; i < sz; i++)
-      pMem[i] = TDynamicVector<T>(sz);
-  }
+	Node* find(T value) {
+		Node* current = first;
+		while (current != nullptr) {
+			if (current->data == value) {
+				return current;
+			}
+			current = current->next;
+		}
+		return nullptr;
+	}
 
-  using TDynamicVector<TDynamicVector<T>>::operator[];
+	Node* get_first() {
+		return first;
+	}
 
-  // сравнение
-  bool operator==(const TDynamicMatrix& m) const noexcept
-  {
-  }
 
-  // матрично-скалярные операции
-  TDynamicVector<T> operator*(const T& val)
-  {
-  }
+	//Iterator
+	class Iterator {
+	protected:
+		Node* curr;
+	public:
+		Iterator(Node* node) : curr(node) {}
 
-  // матрично-векторные операции
-  TDynamicVector<T> operator*(const TDynamicVector<T>& v)
-  {
-  }
+		Iterator& operator++() {
+			curr = curr->next;
+			return *this;
+		}
 
-  // матрично-матричные операции
-  TDynamicMatrix operator+(const TDynamicMatrix& m)
-  {
-  }
-  TDynamicMatrix operator-(const TDynamicMatrix& m)
-  {
-  }
-  TDynamicMatrix operator*(const TDynamicMatrix& m)
-  {
-  }
+		Iterator operator++(int) {
+			Iterator copy = *this;
+			curr = curr->next;
+			return copy;
+		}
 
-  // ввод/вывод
-  friend istream& operator>>(istream& istr, TDynamicMatrix& v)
-  {
-  }
-  friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& v)
-  {
-  }
+		T& operator* () {
+			return curr->data;
+		}
+
+		T& operator->() {
+			return &(curr->data);
+		}
+
+		friend bool operator !=(const Iterator& it1, const Iterator& it2) {
+			return it1.curr != it2.curr;
+		}
+
+		
+	};
+	
+	Iterator begin() {
+		return Iterator(first);
+
+	}
+
+	Iterator end() {
+		return Iterator(nullptr);
+
+	}
+	
+
 };
 
 #endif
