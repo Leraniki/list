@@ -176,3 +176,45 @@ TEST(List, can_find_elem)
 	EXPECT_EQ(l.find(0), l.get_first());
 }
 
+//задача #5
+TEST(List, task_5_not_even) {
+	List<int> l(5);
+	int k = 0;
+	for (int i = 0; i < 5; i++) {
+		l[i] += k;
+		k++;
+	}
+	l.print();
+	std::cout << '\n' << std::endl;
+	//0 1 2 3 4  
+	l.del_mid_elem();
+	l.print();
+
+	//0 1 4 
+	EXPECT_EQ(3, l.size());
+	EXPECT_EQ(l[0], 0);
+	EXPECT_EQ(l[1], 1);
+	EXPECT_EQ(l[2], 4);
+}
+
+TEST(List, task_5_even) {
+	List<int> l(6);
+	int k = 0;
+	for (int i = 0; i < 6; i++) {
+		l[i] += k;
+		k++;
+	}
+	l.print();
+	std::cout << '\n' << std::endl;
+	//0 1 2 3 4 5 
+	l.del_mid_elem();
+	l.print();
+
+	//0 1 2 4 5 
+	EXPECT_EQ(5, l.size());
+	EXPECT_EQ(l[0], 0);
+	EXPECT_EQ(l[1], 1);
+	EXPECT_EQ(l[2], 2);
+	EXPECT_EQ(l[3], 4);
+	EXPECT_EQ(l[4], 5);
+}

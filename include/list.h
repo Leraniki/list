@@ -162,6 +162,42 @@ public:
 		return first;
 	}
 
+	//задача
+	void del_mid_elem() {
+		if (first == nullptr || first->next == nullptr) {
+			return; 
+		}
+
+		Node* slow = first;
+		Node* fast = first;
+		Node* prev = nullptr;
+
+		while (fast != nullptr && fast->next != nullptr) {
+			fast = fast->next->next;
+			prev = slow;
+			slow = slow->next;
+		}
+
+		
+
+		if (prev != nullptr) {
+			prev->next = slow->next;
+			delete slow;
+
+			if (fast != nullptr) {
+				slow = prev->next;
+				if (slow != nullptr) { 
+					prev->next = slow->next;
+					delete slow;
+				}
+			}
+		}
+		else {
+			
+			first = slow->next;
+			delete slow;
+		}
+	}
 
 	//Iterator
 	class Iterator {
